@@ -1,2 +1,75 @@
-ugv
-jhh
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="description" content="PM BUSINESS - Boutique de mode en ligne à Lubumbashi. Connectez-vous avec nos meilleurs fournisseurs.">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PM BUSINESS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;800&display=swap" rel="stylesheet">
+    <!-- Bibliothèque pour les icônes du footer -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- SDK Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header id="main-header">
+    <div class="header-top">
+        <div class="logo"><span>PM</span><span> BUSINESS</span></div>
+        <div class="search" id="search-bar">
+            <input type="text" placeholder="🔍 Recherche un produit">
+        </div>
+    </div>
+    <div class="nav">
+        <button class="active" onclick="showPage('articles', this)">Articles</button>
+        <button onclick="showPage('fournisseurs', this)">Fournisseur</button>
+        <button onclick="showPage('categories', this)">Catégories</button>
+    </div>
+</header>
+
+<div id="articles" class="page active"><div class="container"><h2 class="titre">Articles</h2><div class="grid-3" id="articles-grid"></div></div></div>
+<div id="fournisseurs" class="page"><div class="container"><h2 class="titre">Fournisseurs</h2><button class="btn-inscrire" onclick="openForm()">S'inscrire comme fournisseur</button><div id="liste-fournisseurs"></div></div></div>
+<div id="categories" class="page"><div class="categories"><div class="sidebar" id="sidebar-cat"></div><div class="products"><div class="grid-2" id="cat-products"></div></div></div></div>
+<div id="message" class="page"><div class="container"><h2 class="titre">Message</h2><p style="text-align:center;">Comment souhaitez-vous discuter avec un fournisseur?</p><div class="choix-btn"><a href="https://wa.me/243812345678" target="_blank" class="btn-wa">📱 Par WhatsApp</a><a href="#" onclick="openChatList(event)" class="btn-site">💬 Sur le site</a></div></div></div>
+<div id="apropos" class="page"><div class="container"><h2 class="titre">À propos</h2><div style="background:white;padding:20px;border-radius:15px;"><h3>Qui sommes-nous?</h3><p>PM BUSINESS est votre boutique de mode n°1 à Lubumbashi.</p></div></div></div>
+
+<!-- POPUP GENERAL -->
+<div class="popup" id="popup"><div class="popup-content"><span class="close" onclick="closePopup()">X</span><div id="popup-content"></div></div></div>
+
+<!-- POPUP FORMULAIRE INSCRIPTION (SÉCURISÉ SANS TEL/EMAIL) -->
+<div class="popup" id="form-popup"><div class="popup-content form-popup"><span class="close" onclick="closeForm()">X</span>
+    <h3>Inscription Fournisseur</h3>
+    <input type="text" id="nom" placeholder="Nom Complet ou Boutique">
+    <input type="text" id="pays" placeholder="Ville / Pays">
+    
+    <!-- Code secret pour remplacer le téléphone -->
+    <input type="password" id="code_secret" placeholder="Créez un Code Secret (ex: 1234)">
+    
+    <p style="font-size:12px; margin-top:10px; text-align:left; font-weight:bold;">Photo de profil :</p>
+    <input type="file" id="fourni-photo" accept="image/*" style="border:none; background:none; padding:5px;">
+    
+    <p style="font-size:10px; color:#666; margin:10px 0; line-height:1.2;">Vos données sont privées. Aucune information personnelle (Email/Tel) n'est collectée.</p>
+
+    <button onclick="inscription()">Valider</button>
+</div></div>
+
+<footer id="main-footer">
+    <div class="active" onclick="showPage('articles', this)">
+        <i class="fas fa-home"></i>
+        <span>Accueil</span>
+    </div>
+    <div onclick="showPage('message', this)">
+        <i class="fas fa-comment-dots"></i>
+        <span>Message</span>
+    </div>
+    <div onclick="showPage('apropos', this)">
+        <i class="fas fa-info-circle"></i>
+        <span>À propos</span>
+    </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+  </html>
