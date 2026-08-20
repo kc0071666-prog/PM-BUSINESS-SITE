@@ -150,3 +150,37 @@ footer div.active i { color: var(--rouge) !important; }
 /* --- LISTE FOURNISSEURS --- */
 .fournisseur { display: flex; gap: 15px; background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
 .fournisseur img { width: 60px; height: 60px; border-radius: 50%; border: 3px solid var(--jaune); object-fit: cover; background: #eee; }
+
+/* Container de l'article dans la liste de gestion */
+.item-a-supprimer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #eee;
+}
+
+/* La case à cocher */
+.check-art {
+    width: 20px !important;
+    height: 20px !important;
+    margin: 0 !important;
+    cursor: pointer;
+}
+
+.item-a-supprimer img {
+    width: 45px;
+    height: 45px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+/* Bouton supprimer multiple */
+#btn-suppr-multiple {
+    background: var(--rouge) !important;
+    display: none; /* Caché par défaut, s'affiche si on coche */
+    margin-bottom: 20px;
+}
