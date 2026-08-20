@@ -95,19 +95,83 @@ async function loadFournisseurs(){
     }
 }
 
+// DASHBOARD FOURNISSEUR AVEC SUPPRESSION MULTIPLE
 async function dashboardFournisseur(id, nom){
     let monId = localStorage.getItem('mon_id_fournisseur');
     document.getElementById('popup').classList.add('active');
+
     if(monId === id) {
         fournisseurConnecteID = id;
-        document.getElementById('popup-content').innerHTML = `<span class="close" onclick="closePopup()">×</span><h3>Bonjour ${nom}</h3><button onclick="openFormArticle()">+ Publier un Article</button><h4 style="margin-top:20px;">Messages reçus</h4><div id="client-list">Chargement...</div>`;
+        document.getElementById('popup-content').innerHTML = `
+            <span class="close" onclick="closePopup()">×</span>
+            <h3>Bonjour ${nom}</h3>
+            <button onclick="openFormArticle()">+ Publier un Article</button>
+            
+            <h4 style="margin-top:20px;">Gérer mes articles</h4>
+            <div id="mes-articles-list" style="margin:10px 0; max-height:200px; overflow-y:auto; text-align:left; background:#f9f9f9; padding:10px; border-radius:10px;">
+                Chargement...
+            </div>
+            <button id="btn-suppr-multiple" style="background:var(--rouge); display:none; margin-bottom:20px;" onclick="supprimerSelection('${nom}')">Supprimer la sélection (0)</button>
+
+            <h4 style="margin-top:20px;">Messages reçus</h4>
+            <div id="client-list">Chargement...</div>`;
+            
+        // Charger les articles du fournisseur
+        const { data: sesArticles } = await _supabase.from('articles').select('*').eq('fournisseur_id', id);
+        let artListDiv = document.getElementById('mes-articles-list');
+        
+        if(!sesArticles || sesArticles.length === 0) {
+            artListDiv.innerHTML = "Aucun article publié.";
+        } else {
+            artListDiv.innerHTML = "";
+            sesArticles.forEach(art => {
+                artListDiv.innerHTML += `
+                    <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px; background:white; padding:8px; border-radius:8px; border:1px solid #eee;">
+                        <input type="checkbox" class="check-art" value="${art.id}" onchange="updateDeleteButton()" style="width:18px; height:18px;">
+                        <img src="${art.image_url}" style="width:40px; height:40px; object-fit:cover; border-radius:5px;">
+                        <span style="font-size:12px; font-weight:700; flex:1;">${art.nom}</span>
+                    </div>`;
+            });
+        }
+
+        // Charger les messages
         const { data: msgs } = await _supabase.from('messages').select('nom_client').eq('fournisseur_id', id);
         let clientsUnique = [...new Set(msgs?.map(m => m.nom_client))];
         let listDiv = document.getElementById('client-list');
         listDiv.innerHTML = (clientsUnique.length === 0) ? "Aucun message" : "";
-        clientsUnique.forEach(client => { listDiv.innerHTML += `<div class="msg-client" style="cursor:pointer; margin-top:10px;" onclick="openChatRoom('${id}', '${client}', 'fournisseur')">Discussion avec ${client}</div>`; });
+        clientsUnique.forEach(client => { 
+            listDiv.innerHTML += `<div class="msg-client" style="cursor:pointer; margin-top:10px;" onclick="openChatRoom('${id}', '${client}', 'fournisseur')">Discussion avec ${client}</div>`; 
+        });
     } else {
         document.getElementById('popup-content').innerHTML = `<span class="close" onclick="closePopup()">×</span><h3>Vendeur : ${nom}</h3><p style="margin:20px 0;">Discutez avec ce vendeur pour passer commande.</p><button onclick="demanderNomClient('${id}', '${nom}')">💬 Lui envoyer un message</button><hr style="margin:20px 0; opacity:0.1;"><button style="background:#777; font-size:11px; padding:8px;" onclick="connexionFournisseur('${id}', '${nom}')">Accès Propriétaire</button>`;
+    }
+}
+
+// FONCTIONS POUR LA SUPPRESSION
+function updateDeleteButton() {
+    const checkboxes = document.querySelectorAll('.check-art:checked');
+    const btn = document.getElementById('btn-suppr-multiple');
+    if (checkboxes.length > 0) {
+        btn.style.display = 'block';
+        btn.innerText = `Supprimer la sélection (${checkboxes.length})`;
+    } else {
+        btn.style.display = 'none';
+    }
+}
+
+async function supprimerSelection(fournisseurNom) {
+    const checkboxes = document.querySelectorAll('.check-art:checked');
+    const idsASupprimer = Array.from(checkboxes).map(cb => cb.value);
+
+    if (confirm(`Voulez-vous vraiment supprimer ces ${idsASupprimer.length} articles ?`)) {
+        const { error } = await _supabase.from('articles').delete().in('id', idsASupprimer);
+        if (!error) {
+            alert("Articles supprimés !");
+            loadArticles();
+            dashboardFournisseur(fournisseurConnecteID, fournisseurNom);
+        } else {
+            alert("Erreur : " + error.message);
+        }
     }
 }
 
@@ -196,7 +260,15 @@ async function filterCat(cat, el){
     grid.innerHTML='';
     if(filtered) { 
         filtered.forEach(a=>{ 
-            grid.innerHTML += `<div class="card" onclick="openPopup('${a.nom.replace(/'/g, "\\'")}','${a.prix}','${a.image_url}')"><img src="${a.image_url}"><h4>${a.nom}</h4><div class="price-container"><p>${a.prix}</p><span class="btn-panier" onclick="event.stopPropagation(); showPage('message', document.querySelectorAll('footer div')[1])">🛒</span></div></div>` 
+            grid.innerHTML += `
+            <div class="card" onclick="openPopup('${a.nom.replace(/'/g, "\\'")}','${a.prix}','${a.image_url}')">
+                <img src="${a.image_url}">
+                <h4>${a.nom}</h4>
+                <div class="price-container">
+                    <p>${a.prix}</p>
+                    <span class="btn-panier" onclick="event.stopPropagation(); showPage('message', document.querySelectorAll('footer div')[1])">🛒</span>
+                </div>
+            </div>` 
         }); 
     }
 }
