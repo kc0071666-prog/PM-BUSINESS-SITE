@@ -35,29 +35,44 @@
 <div id="categories" class="page"><div class="categories"><div class="sidebar" id="sidebar-cat"></div><div class="products"><div class="grid-2" id="cat-products"></div></div></div></div>
 <div id="message" class="page"><div class="container"><h2 class="titre">Message</h2><p style="text-align:center;">Comment souhaitez-vous discuter avec un fournisseur?</p><div class="choix-btn"><a href="https://wa.me/243802795223" target="_blank" class="btn-wa">📱 Par WhatsApp</a><a href="#" onclick="openChatList(event)" class="btn-site">💬 Sur le site</a></div></div></div>
 
+<!-- SECTION À PROPOS STYLISÉE PAR BLOCS -->
 <div id="apropos" class="page">
     <div class="container">
         <h2 class="titre">À propos</h2>
-        <div style="background:white;padding:20px;border-radius:15px; text-align: left;">
-            <p><strong>PM BUSINESS</strong> est votre boutique d'habillement en ligne basée à Lubumbashi.</p>
-            <p style="margin-top:10px;">Nous proposons des vêtements tendance pour hommes, femmes et enfants - qualité supérieure, prix accessibles.</p>
-            
-            <h4 style="margin-top:15px;">Notre engagement :</h4>
-            <ul style="margin-left:20px; margin-top:5px;">
-                <li>Livraison rapide à Lubumbashi et dans tout le Katanga</li>
-                <li>Articles conformes aux photos</li>
-                <li>Paiement à la livraison - pas besoin de donner votre carte bancaire en ligne</li>
-                <li>Échanges possibles si la taille ne convient pas</li>
-            </ul>
-            
-            <p style="margin-top:15px;">Basés à <strong>Lubumbashi</strong>, nous sommes joignables 7j/7 sur WhatsApp pour vous conseiller sur les tailles et modèles.</p>
-            <p style="margin-top:10px; font-weight:bold; color:var(--bleu);">PM BUSINESS - S'habiller avec style, sans se ruiner.</p>
-            
-            <hr style="margin:20px 0; opacity:0.2;">
-            
-            <p style="font-size: 13px;"><strong>Fournisseur principal :</strong> Don urbain mutima</p>
-            <p style="font-size: 13px; margin-top:5px;"><strong>Développeur du site :</strong> CYRIL KELVIN</p>
-            <p style="font-size: 13px; margin-top:5px;"><strong>Contact :</strong> +243970709671</p>
+        
+        <!-- Bloc 1: Identité -->
+        <div style="background:white; padding:20px; border-radius:15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom:15px; border-left: 5px solid var(--bleu);">
+            <p style="font-size: 1.1rem;"><strong>PM BUSINESS</strong></p>
+            <p style="margin-top:5px; color:#555; font-size:0.9rem;">Votre boutique d'habillement en ligne basée à Lubumbashi.</p>
+        </div>
+
+        <!-- Bloc 2: Ce que nous proposons -->
+        <div style="background:white; padding:20px; border-radius:15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom:15px;">
+            <p style="color:#333; line-height:1.5;">Nous proposons des vêtements tendance pour <strong>hommes, femmes et enfants</strong>. Une qualité supérieure à prix accessibles.</p>
+        </div>
+
+        <!-- Bloc 3: Nos Engagements (Points Clés) -->
+        <div style="background:white; padding:20px; border-radius:15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom:15px; border-top: 3px solid var(--jaune);">
+            <h4 style="color:var(--bleu); margin-bottom:12px;"><i class="fas fa-star" style="color:var(--jaune)"></i> Notre engagement :</h4>
+            <div style="display:flex; flex-direction:column; gap:10px; font-size:0.85rem;">
+                <div style="display:flex; gap:10px; align-items:center;"><i class="fas fa-truck" style="color:var(--bleu); width:20px;"></i> <span>Livraison rapide (Lubumbashi & Katanga)</span></div>
+                <div style="display:flex; gap:10px; align-items:center;"><i class="fas fa-camera" style="color:var(--bleu); width:20px;"></i> <span>Articles 100% conformes aux photos</span></div>
+                <div style="display:flex; gap:10px; align-items:center;"><i class="fas fa-hand-holding-usd" style="color:var(--bleu); width:20px;"></i> <span>Paiement cash à la livraison</span></div>
+                <div style="display:flex; gap:10px; align-items:center;"><i class="fas fa-sync-alt" style="color:var(--bleu); width:20px;"></i> <span>Échanges possibles (problème de taille)</span></div>
+            </div>
+        </div>
+
+        <!-- Bloc 4: Slogan et WhatsApp -->
+        <div style="background:linear-gradient(135deg, var(--bleu), #002d5a); color:white; padding:20px; border-radius:15px; text-align:center; margin-bottom:15px;">
+            <p style="font-weight:bold; font-style:italic; font-size:1rem;">"S'habiller avec style, sans se ruiner."</p>
+            <p style="margin-top:10px; font-size:0.8rem; opacity:0.9;">Joignables 7j/7 sur WhatsApp pour vous conseiller.</p>
+        </div>
+
+        <!-- Bloc 5: Crédits -->
+        <div style="background:rgba(255,255,255,0.6); padding:15px; border-radius:15px; border:1px dashed #ccc; font-size: 0.8rem; color: #666;">
+            <p><strong>Fournisseur principal :</strong> Don urbain mutima</p>
+            <p style="margin-top:5px;"><strong>Développeur du site :</strong> CYRIL KELVIN</p>
+            <p style="margin-top:5px;"><strong>Contact :</strong> +243970709671</p>
         </div>
     </div>
 </div>
@@ -99,4 +114,4 @@
 
 <script src="script.js"></script>
 </body>
-</html>
+    </html>
