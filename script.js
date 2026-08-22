@@ -116,13 +116,10 @@ async function dashboardFournisseur(id, nom){
             <h4 style="margin-top:20px;">Messages reçus</h4>
             <div id="client-list">Chargement...</div>`;
             
-        // Charger les articles du fournisseur
         const { data: sesArticles } = await _supabase.from('articles').select('*').eq('fournisseur_id', id);
         let artListDiv = document.getElementById('mes-articles-list');
-        
-        if(!sesArticles || sesArticles.length === 0) {
-            artListDiv.innerHTML = "Aucun article publié.";
-        } else {
+        if(!sesArticles || sesArticles.length === 0) { artListDiv.innerHTML = "Aucun article publié."; } 
+        else {
             artListDiv.innerHTML = "";
             sesArticles.forEach(art => {
                 artListDiv.innerHTML += `
@@ -134,44 +131,30 @@ async function dashboardFournisseur(id, nom){
             });
         }
 
-        // Charger les messages
         const { data: msgs } = await _supabase.from('messages').select('nom_client').eq('fournisseur_id', id);
         let clientsUnique = [...new Set(msgs?.map(m => m.nom_client))];
         let listDiv = document.getElementById('client-list');
         listDiv.innerHTML = (clientsUnique.length === 0) ? "Aucun message" : "";
-        clientsUnique.forEach(client => { 
-            listDiv.innerHTML += `<div class="msg-client" style="cursor:pointer; margin-top:10px;" onclick="openChatRoom('${id}', '${client}', 'fournisseur')">Discussion avec ${client}</div>`; 
-        });
+        clientsUnique.forEach(client => { listDiv.innerHTML += `<div class="msg-client" style="cursor:pointer; margin-top:10px;" onclick="openChatRoom('${id}', '${client}', 'fournisseur')">Discussion avec ${client}</div>`; });
     } else {
         document.getElementById('popup-content').innerHTML = `<span class="close" onclick="closePopup()">×</span><h3>Vendeur : ${nom}</h3><p style="margin:20px 0;">Discutez avec ce vendeur pour passer commande.</p><button onclick="demanderNomClient('${id}', '${nom}')">💬 Lui envoyer un message</button><hr style="margin:20px 0; opacity:0.1;"><button style="background:#777; font-size:11px; padding:8px;" onclick="connexionFournisseur('${id}', '${nom}')">Accès Propriétaire</button>`;
     }
 }
 
-// FONCTIONS POUR LA SUPPRESSION
 function updateDeleteButton() {
     const checkboxes = document.querySelectorAll('.check-art:checked');
     const btn = document.getElementById('btn-suppr-multiple');
-    if (checkboxes.length > 0) {
-        btn.style.display = 'block';
-        btn.innerText = `Supprimer la sélection (${checkboxes.length})`;
-    } else {
-        btn.style.display = 'none';
-    }
+    if (checkboxes.length > 0) { btn.style.display = 'block'; btn.innerText = `Supprimer la sélection (${checkboxes.length})`; } 
+    else { btn.style.display = 'none'; }
 }
 
 async function supprimerSelection(fournisseurNom) {
     const checkboxes = document.querySelectorAll('.check-art:checked');
     const idsASupprimer = Array.from(checkboxes).map(cb => cb.value);
-
     if (confirm(`Voulez-vous vraiment supprimer ces ${idsASupprimer.length} articles ?`)) {
         const { error } = await _supabase.from('articles').delete().in('id', idsASupprimer);
-        if (!error) {
-            alert("Articles supprimés !");
-            loadArticles();
-            dashboardFournisseur(fournisseurConnecteID, fournisseurNom);
-        } else {
-            alert("Erreur : " + error.message);
-        }
+        if (!error) { alert("Articles supprimés !"); loadArticles(); dashboardFournisseur(fournisseurConnecteID, fournisseurNom); } 
+        else { alert("Erreur : " + error.message); }
     }
 }
 
@@ -187,10 +170,8 @@ async function connexionFournisseur(id, nom){
 async function verifierConnexion(id){
     let code = document.getElementById('confirm-code').value;
     const { data: f } = await _supabase.from('fournisseurs').select('*').eq('id', id).single();
-    if(f && f.code_secret === code){ 
-        localStorage.setItem('mon_id_fournisseur', id); 
-        alert("Connecté !"); dashboardFournisseur(id, f.nom); 
-    } else { alert("Code incorrect."); }
+    if(f && f.code_secret === code){ localStorage.setItem('mon_id_fournisseur', id); alert("Connecté !"); dashboardFournisseur(id, f.nom); } 
+    else { alert("Code incorrect."); }
 }
 
 function openFormArticle(){
@@ -220,17 +201,65 @@ async function openChatList(event){
     document.getElementById('popup-content').innerHTML = html;
 }
 
+// --- MODIFICATION : RETENIR LE NOM DU CLIENT ---
 function demanderNomClient(fId, fNom){
+    let nomSauvegarde = localStorage.getItem('mon_nom_client') || ""; // Récupère le nom s'il existe
     document.getElementById('popup-content').innerHTML = `
         <span class="close" onclick="closePopup()">×</span>
         <h3>Votre Nom</h3>
-        <input type="text" id="client-pseudo" placeholder="Votre nom">
+        <input type="text" id="client-pseudo" placeholder="Votre nom" value="${nomSauvegarde}">
         <button onclick="lancerChat('${fId}')">Commencer</button>`;
 }
 
 function lancerChat(fId){
     let nomC = document.getElementById('client-pseudo').value;
-    if(nomC) openChatRoom(fId, nomC, 'client');
+    if(nomC) {
+        localStorage.setItem('mon_nom_client', nomC); // Sauvegarde le nom pour la prochaine fois
+        openChatRoom(fId, nomC, 'client');
+    }
+}
+
+// --- MODIFICATION : BOUTON SUPPRIMER CONVERSATION ---
+async function openChatRoom(fId, clientNom, role){
+    fournisseurConnecteID = fId;
+    let expediteurNom = (role === 'client') ? clientNom : "Fournisseur";
+    
+    document.getElementById('popup-content').innerHTML = `
+        <span class="close" onclick="closePopup()">×</span>
+        <h3 style="margin-bottom:10px;">Chat</h3>
+        <div id="chat-box" class="msg-container" style="height:300px; overflow-y:auto;"></div>
+        <div class="chat-input-area">
+            <input type="text" id="msg-input" placeholder="Message...">
+            <button onclick="envoyerMessage('${clientNom}', '${expediteurNom}')">➤</button>
+        </div>
+        <button onclick="supprimerConversation('${fId}', '${clientNom}')" style="background:none; color:red; font-size:11px; margin-top:10px; border:none; text-decoration:underline; cursor:pointer;">Supprimer la conversation</button>`;
+    
+    loadMessages(fId, clientNom);
+    if(window.chatInterval) clearInterval(window.chatInterval);
+    window.chatInterval = setInterval(() => loadMessages(fId, clientNom), 3000);
+}
+
+async function supprimerConversation(fId, clientNom) {
+    if(confirm("Voulez-vous supprimer toute cette discussion ?")) {
+        const { error } = await _supabase.from('messages').delete().eq('fournisseur_id', fId).eq('nom_client', clientNom);
+        if(!error) {
+            document.getElementById('chat-box').innerHTML = "";
+            alert("Conversation effacée.");
+        }
+    }
+}
+
+async function envoyerMessage(clientNom, expediteur){
+    let txt = document.getElementById('msg-input').value;
+    if(!txt) return;
+    await _supabase.from('messages').insert([{ fournisseur_id: fournisseurConnecteID, nom_client: clientNom, expediteur: expediteur, contenu: txt }]);
+    document.getElementById('msg-input').value = ""; loadMessages(fournisseurConnecteID, clientNom);
+}
+
+async function loadMessages(fId, clientNom){
+    const { data } = await _supabase.from('messages').select('*').eq('fournisseur_id', fId).eq('nom_client', clientNom).order('created_at', { ascending: true });
+    let box = document.getElementById('chat-box');
+    if(box && data){ box.innerHTML = data.map(m => `<div class="msg-bubble ${m.expediteur !== "Fournisseur" ? 'msg-client' : 'msg-fournisseur'}"><span class="msg-name">${m.expediteur}</span>${m.contenu}</div>`).join(''); box.scrollTop = box.scrollHeight; }
 }
 
 // RECHERCHE
@@ -271,26 +300,6 @@ async function filterCat(cat, el){
             </div>` 
         }); 
     }
-}
-
-async function openChatRoom(fId, clientNom, role){
-    fournisseurConnecteID = fId;
-    let expediteurNom = (role === 'client') ? clientNom : "Fournisseur";
-    document.getElementById('popup-content').innerHTML = `<span class="close" onclick="closePopup()">×</span><h3 style="margin-bottom:10px;">Chat</h3><div id="chat-box" class="msg-container" style="height:300px; overflow-y:auto;"></div><div class="chat-input-area"><input type="text" id="msg-input" placeholder="Message..."><button onclick="envoyerMessage('${clientNom}', '${expediteurNom}')">➤</button></div>`;
-    loadMessages(fId, clientNom);
-    if(window.chatInterval) clearInterval(window.chatInterval);
-    window.chatInterval = setInterval(() => loadMessages(fId, clientNom), 3000);
-}
-async function envoyerMessage(clientNom, expediteur){
-    let txt = document.getElementById('msg-input').value;
-    if(!txt) return;
-    await _supabase.from('messages').insert([{ fournisseur_id: fournisseurConnecteID, nom_client: clientNom, expediteur: expediteur, contenu: txt }]);
-    document.getElementById('msg-input').value = ""; loadMessages(fournisseurConnecteID, clientNom);
-}
-async function loadMessages(fId, clientNom){
-    const { data } = await _supabase.from('messages').select('*').eq('fournisseur_id', fId).eq('nom_client', clientNom).order('created_at', { ascending: true });
-    let box = document.getElementById('chat-box');
-    if(box && data){ box.innerHTML = data.map(m => `<div class="msg-bubble ${m.expediteur !== "Fournisseur" ? 'msg-client' : 'msg-fournisseur'}"><span class="msg-name">${m.expediteur}</span>${m.contenu}</div>`).join(''); box.scrollTop = box.scrollHeight; }
 }
 
 function openForm(){document.getElementById('form-popup').classList.add('active');}
